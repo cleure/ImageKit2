@@ -9,4 +9,5 @@ Goals:
 - Simplified error system.
 - Wide variety of out-of-the-box filters.
 - High quality drawing routines.
+- Integration to the XCode build system (in addition to vanilla CMake).
 
