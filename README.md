@@ -6,4 +6,7 @@ Goals:
 - Be simple (no cumbersome APIs, common storage format).
 - Be portable (OS X, Linux).
 - Support for Python, NodeJS, C APIs.
+- Simplified error system.
+- Wide variety of out-of-the-box filters.
+- High quality drawing routines.
 
