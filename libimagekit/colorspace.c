@@ -11,6 +11,15 @@ TODO: What does a greyscale image look like?
 [1.0, 0.0, 0.0, 1.0]
 [1.0, 1.0]
 
+TODO: I really don't like this API... Maybe:
+
+API
+int
+ImageKit_Colorspace_RGB2HSV(
+    REAL *src,
+    REAL *dst
+);
+
 */
 
 API
@@ -19,11 +28,9 @@ ImageKit_Colorspace_RGB2HSV(
     REAL r,
     REAL g,
     REAL b,
-    REAL a,
     REAL *oh,
     REAL *os,
-    REAL *ov,
-    REAL *oa
+    REAL *ov
 )
 {
     REAL hue;
@@ -63,7 +70,6 @@ ImageKit_Colorspace_RGB2HSV(
     *oh = hue / 6.0;
     *os = saturation;
     *ov = value;
-    *oa = a;
     
     return 0;
 }

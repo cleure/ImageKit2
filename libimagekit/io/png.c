@@ -75,7 +75,7 @@ PNG_Open(const char *filepath, PNG_IO *png)
     
     // Init PNG stuff
     png_init_io(png->png_ptr, fp);
-    png_read_png(png->png_ptr, png->info_ptr, PNG_TRANSFORM_IDENTITY | PNG_TRANSFORM_EXPAND, NULL);
+    png_read_png(png->png_ptr, png->info_ptr, PNG_TRANSFORM_IDENTITY | PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_STRIP_ALPHA, NULL);
     fclose(fp);
     fp = NULL;
     

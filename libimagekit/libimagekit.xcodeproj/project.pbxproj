@@ -1,0 +1,170 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		606E892A1B4A1FEF00FA2E61 /* .DS_Store */ = {isa = PBXFileReference; lastKnownFileType = file; path = .DS_Store; sourceTree = "<group>"; };
+		606E892B1B4A1FEF00FA2E61 /* build-header.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = "build-header.py"; sourceTree = "<group>"; };
+		606E892C1B4A1FEF00FA2E61 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		606E892D1B4A1FEF00FA2E61 /* colorspace.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = colorspace.c; sourceTree = "<group>"; };
+		606E892E1B4A1FEF00FA2E61 /* colorspace.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = colorspace.h; sourceTree = "<group>"; };
+		606E892F1B4A1FEF00FA2E61 /* config.h.in */ = {isa = PBXFileReference; lastKnownFileType = text; path = config.h.in; sourceTree = "<group>"; };
+		606E89301B4A1FEF00FA2E61 /* error.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = error.h; sourceTree = "<group>"; };
+		606E89311B4A1FEF00FA2E61 /* filters */ = {isa = PBXFileReference; lastKnownFileType = folder; path = filters; sourceTree = "<group>"; };
+		606E89321B4A1FEF00FA2E61 /* image.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = image.c; sourceTree = "<group>"; };
+		606E89331B4A1FEF00FA2E61 /* image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = image.h; sourceTree = "<group>"; };
+		606E89341B4A1FEF00FA2E61 /* imagekit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = imagekit.h; sourceTree = "<group>"; };
+		606E89351B4A1FEF00FA2E61 /* io */ = {isa = PBXFileReference; lastKnownFileType = folder; path = io; sourceTree = "<group>"; };
+		606E89361B4A1FEF00FA2E61 /* libimagekit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libimagekit.h; sourceTree = "<group>"; };
+		606E89371B4A1FEF00FA2E61 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		606E89381B4A1FEF00FA2E61 /* rect-subdivide.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = "rect-subdivide.py"; sourceTree = "<group>"; };
+		606E89391B4A1FEF00FA2E61 /* test.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
+		606E893A1B4A1FEF00FA2E61 /* test.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = test.py; sourceTree = "<group>"; };
+		606E893B1B4A1FEF00FA2E61 /* types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		606E89241B4A1FEF00FA2E61 = {
+			isa = PBXGroup;
+			children = (
+				606E892A1B4A1FEF00FA2E61 /* .DS_Store */,
+				606E892B1B4A1FEF00FA2E61 /* build-header.py */,
+				606E892C1B4A1FEF00FA2E61 /* CMakeLists.txt */,
+				606E892D1B4A1FEF00FA2E61 /* colorspace.c */,
+				606E892E1B4A1FEF00FA2E61 /* colorspace.h */,
+				606E892F1B4A1FEF00FA2E61 /* config.h.in */,
+				606E89301B4A1FEF00FA2E61 /* error.h */,
+				606E89311B4A1FEF00FA2E61 /* filters */,
+				606E89321B4A1FEF00FA2E61 /* image.c */,
+				606E89331B4A1FEF00FA2E61 /* image.h */,
+				606E89341B4A1FEF00FA2E61 /* imagekit.h */,
+				606E89351B4A1FEF00FA2E61 /* io */,
+				606E89361B4A1FEF00FA2E61 /* libimagekit.h */,
+				606E89371B4A1FEF00FA2E61 /* Makefile */,
+				606E89381B4A1FEF00FA2E61 /* rect-subdivide.py */,
+				606E89391B4A1FEF00FA2E61 /* test.c */,
+				606E893A1B4A1FEF00FA2E61 /* test.py */,
+				606E893B1B4A1FEF00FA2E61 /* types.h */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		606E89291B4A1FEF00FA2E61 /* libimagekit */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 606E893C1B4A1FEF00FA2E61 /* Build configuration list for PBXLegacyTarget "libimagekit" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = /Users/cleure/Development/Projects/ImageKit2/libimagekit;
+			dependencies = (
+			);
+			name = libimagekit;
+			passBuildSettingsInEnvironment = 1;
+			productName = libimagekit;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		606E89251B4A1FEF00FA2E61 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 606E89281B4A1FEF00FA2E61 /* Build configuration list for PBXProject "libimagekit" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 606E89241B4A1FEF00FA2E61;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				606E89291B4A1FEF00FA2E61 /* libimagekit */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		606E89261B4A1FEF00FA2E61 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		606E89271B4A1FEF00FA2E61 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+		606E893D1B4A1FEF00FA2E61 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = libimagekit;
+			};
+			name = Debug;
+		};
+		606E893E1B4A1FEF00FA2E61 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = libimagekit;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		606E89281B4A1FEF00FA2E61 /* Build configuration list for PBXProject "libimagekit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				606E89261B4A1FEF00FA2E61 /* Debug */,
+				606E89271B4A1FEF00FA2E61 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		606E893C1B4A1FEF00FA2E61 /* Build configuration list for PBXLegacyTarget "libimagekit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				606E893D1B4A1FEF00FA2E61 /* Debug */,
+				606E893E1B4A1FEF00FA2E61 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 606E89251B4A1FEF00FA2E61 /* Project object */;
+}

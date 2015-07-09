@@ -16,11 +16,9 @@ ImageKit_Colorspace_RGB2HSV(
     REAL r,
     REAL g,
     REAL b,
-    REAL a,
     REAL *oh,
     REAL *os,
-    REAL *ov,
-    REAL *oa
+    REAL *ov
 );
 
 //API
