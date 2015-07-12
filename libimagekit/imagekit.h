@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <math.h>
 #include "types.h"
 
 #if defined(__GNUC__)
@@ -16,6 +17,10 @@
 
 #define PIXEL_INDEX(self, x, y)\
     (self->pitch * (y)) + ((x) * self->channels)
+
+#define MAX(r, s) ((r) + (s) + fabs((r) - (s))) / 2
+#define MIN(r, s) ((r) + (s) - fabs((r) - (s))) / 2
+#define CLAMP(minValue, maxValue, value) MAX(minValue, MIN(maxValue, value))
 
 #include "types.h"
 #include "error.h"

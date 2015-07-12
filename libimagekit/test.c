@@ -145,6 +145,13 @@ ImageKit_Image_GetSubDivideRect(
 }
 */
 
+/*
+
+max(r, s) = (r + s + |r - s|)/2
+min(r, s) = (r + s - |r - s|)/2
+
+*/
+
 int main(int argc, char **argv)
 {
     ImageKit_Image *im;
@@ -152,10 +159,12 @@ int main(int argc, char **argv)
     
     srand(0xfffe);
     
-    im = ImageKit_Image_FromPNG("./output1.png");
+    im = ImageKit_Image_FromPNG("./images/colors.png");
     if (im == NULL) {
         exit(1);
     }
+    
+    ImageKit_Image_SavePNG(im, "output.png", 8);
     
     printf("%f %f %f\n", im->data1[0], im->data1[1], im->data1[2]);
 

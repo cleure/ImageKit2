@@ -7,4 +7,4 @@ ImageKit_Image_FromPNG(const char *filepath);
 
 API
 int
-ImageKit_Image_SavePNG(ImageKit_Image *self, const char *filepath);
+ImageKit_Image_SavePNG(ImageKit_Image *self, const char *filepath, uint32_t depth);

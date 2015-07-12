@@ -5,7 +5,15 @@
 #include <stdint.h>
 #include "imagekit.h"
 
+#ifdef HAVE_PNG
+
 #include <png.h>
+
+/*
+
+Use __LINE__ and __FILE__ for debugging
+
+*/
 
 typedef struct PNG_IO {
     png_structp png_ptr;
@@ -21,7 +29,7 @@ typedef struct PNG_IO {
 
 PRIVATE
 int
-PNG_Open(const char *filepath, PNG_IO *png)
+PNG_Open_Read(const char *filepath, PNG_IO *png)
 {
     FILE *fp;
     
@@ -29,7 +37,7 @@ PNG_Open(const char *filepath, PNG_IO *png)
     if (!fp) {
         #ifdef DEBUG
           fprintf(stderr, "error opening file: %s\n", filepath);
-        #endif;
+        #endif
         
         return -1;
     }
@@ -114,7 +122,7 @@ ImageKit_Image_FromPNG(const char *filepath) {
     REAL *ptr;
     int colorspace;
     
-    if (PNG_Open(filepath, &png) < 0) {
+    if (PNG_Open_Read(filepath, &png) < 0) {
         return NULL;
     }
     
@@ -135,11 +143,9 @@ ImageKit_Image_FromPNG(const char *filepath) {
         return NULL;
     }
     
-    // depth=8, depth=10, depth=16
+    // depth=8, depth=16
     if (png.depth == 8) {
         scale = 1.0 / 255.0;
-    } else if (png.depth == 10) {
-        scale = 1.0 / 1023.0;
     } else if (png.depth == 16) {
         scale = 1.0 / 65535.0;
     } else {
@@ -177,8 +183,163 @@ ImageKit_Image_FromPNG(const char *filepath) {
 
 API
 int
-ImageKit_Image_SavePNG(ImageKit_Image *self, const char *filepath)
+ImageKit_Image_SavePNG(ImageKit_Image *self, const char *filepath, uint32_t depth)
 {
-    fprintf(stderr, "Not yet implemented\n");
+    FILE *fp;
+    REAL *ptr_in;
+    REAL scale;
+    REAL value;
+    int32_t value32;
+    size_t x, y, c;
+    PNG_IO png;
+    png_byte *row = NULL;
+    
+    if (depth == 0) {
+        depth = 8;
+    }
+
+    if (depth == 8) {
+        scale = 255.0;
+    } else if (depth == 16) {
+        scale = 65535.0;
+    } else {
+        #ifdef DEBUG
+            fprintf(stderr, "depth must be one of: 8, 10, 16");
+        #endif
+        
+        return -1;
+    }
+    
+    fp = fopen(filepath, "wb");
+    if (!fp) {
+        #ifdef DEBUG
+            fprintf(stderr, "error opening file: %s\n", filepath);
+        #endif
+        
+        return -1;
+    }
+    
+    // Initialize
+    png.png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    if (png.png_ptr == NULL) {
+        fclose(fp);
+        #ifdef DEBUG
+            fprintf(stderr, "libpng error, error creating write struct\n");
+        #endif
+        
+        return -1;
+    }
+    
+    png.info_ptr = png_create_info_struct(png.png_ptr);
+    if (png.info_ptr == NULL) {
+        png_destroy_write_struct(&png.png_ptr, NULL);
+        fclose(fp);
+        #ifdef DEBUG
+            fprintf(stderr, "libpng error, error creating info struct\n");
+        #endif
+        
+        return -1;
+    }
+
+    // Error Handling
+    if (setjmp(png_jmpbuf(png.png_ptr))) {
+        png_destroy_write_struct(&png.png_ptr, &png.info_ptr);
+        fclose(fp);
+        #ifdef DEBUG
+            fprintf(stderr, "libpng error, returned to exception handler\n");
+        #endif
+        
+        return -1;
+    }
+    
+    png_set_IHDR(   png.png_ptr,
+                    png.info_ptr,
+                    self->width,
+                    self->height,
+                    depth,
+                    PNG_COLOR_TYPE_RGB,
+                    PNG_INTERLACE_NONE,
+                    PNG_COMPRESSION_TYPE_DEFAULT,
+                    PNG_FILTER_TYPE_DEFAULT);
+    
+    ptr_in = (REAL *)(&(self->data1[0]));
+    
+    if (depth == 16) {
+        // 16 Bits Per Channels
+        png.row_pointers = png_malloc(png.png_ptr, sizeof(png_byte *) * self->height);
+    
+        // Scale, clamp, copy
+        for (y = 0; y < self->height; y++) {
+            png.row_pointers[y] = png_malloc(png.png_ptr, sizeof(png_byte) * self->width * self->channels * 2);
+            row = png.row_pointers[y];
+            
+            for (x = 0; x < self->width; x++) {
+                for (c = 0; c < self->channels; c++) {
+                    value = *ptr_in++;
+                    value32 = (int32_t)(CLAMP(0.0, 1.0, value) * scale);
+                    *row++ = value32 >> 8 & 0xff;
+                    *row++ = value32      & 0xff;
+                }
+            }
+        }
+    
+        // Write file
+        png_init_io(png.png_ptr, fp);
+        png_set_rows(png.png_ptr, png.info_ptr, png.row_pointers);
+        png_write_png(png.png_ptr, png.info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
+    
+        for (y = 0; y < self->height; y++) {
+            png_free(png.png_ptr, png.row_pointers[y]);
+        }
+    
+        png_free(png.png_ptr, png.row_pointers);
+    } else {
+        // 8 Bits Per Channels
+        png.row_pointers = png_malloc(png.png_ptr, sizeof(png_byte *) * self->height);
+    
+        // Scale, clamp, copy
+        for (y = 0; y < self->height; y++) {
+            png.row_pointers[y] = png_malloc(png.png_ptr, sizeof(png_byte) * self->width * self->channels);
+            row = png.row_pointers[y];
+            
+            for (x = 0; x < self->width; x++) {
+                for (c = 0; c < self->channels; c++) {
+                    value = *ptr_in++;
+                    *row++ = (int32_t)(CLAMP(0.0, 1.0, value) * scale);
+                }
+            }
+        }
+    
+        // Write file
+        png_init_io(png.png_ptr, fp);
+        png_set_rows(png.png_ptr, png.info_ptr, png.row_pointers);
+        png_write_png(png.png_ptr, png.info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
+    
+        for (y = 0; y < self->height; y++) {
+            png_free(png.png_ptr, png.row_pointers[y]);
+        }
+    
+        png_free(png.png_ptr, png.row_pointers);
+    }
+    
+    png_destroy_write_struct(&png.png_ptr, &png.info_ptr);
+    fclose(fp);
+    
     return 0;
 }
+
+#else
+
+API
+ImageKit_Image *
+ImageKit_Image_FromPNG(const char *filepath) {
+    return NULL;
+}
+
+API
+int
+ImageKit_Image_SavePNG(ImageKit_Image *self, const char *filepath, uint32_t depth) {
+    return -1;
+}
+
+#endif
