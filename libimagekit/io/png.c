@@ -106,11 +106,62 @@ PRIVATE void PNG_Close(PNG_IO *png)
     memset(png, 0, sizeof(*png));
 }
 
+PRIVATE void Import_PNG_rgb8bpp(ImageKit_Image *self, PNG_IO *png, REAL scale) {
+    size_t x, y, c;
+    REAL *ptr = &(self->data1[0]);
+
+    for (y = 0; y < self->height; y++) {
+        for (x = 0; x < self->width; x++) {
+            for (c = 0; c < png->channels; c++) {
+                *ptr++ = (REAL)png->row_pointers[y][x * png->channels + c] * scale;
+            }
+        }
+    }
+}
+
+PRIVATE void Import_PNG_rgb16bpp(ImageKit_Image *self, PNG_IO *png, REAL scale) {
+    size_t x, y, c;
+    REAL *ptr = &(self->data1[0]);
+
+    for (y = 0; y < self->height; y++) {
+        for (x = 0; x < self->width; x++) {
+            for (c = 0; c < png->channels; c++) {
+                *ptr++ = (REAL)png->row_pointers16[y][x * png->channels + c] * scale;
+            }
+        }
+    }
+}
+
 /*
 
-TODO: Ability to set colorspace on load?
+PRIVATE void Import_PNG_grey8bpp() {
+}
+
+PRIVATE void Import_PNG_grey16bpp() {
+}
+*/
+
+/*
+
+    color_type     - describes which color/alpha channels
+                         are present.
+                     PNG_COLOR_TYPE_GRAY
+                        (bit depths 1, 2, 4, 8, 16)
+                     PNG_COLOR_TYPE_RGB
+                        (bit_depths 8, 16)
 
 */
+
+PRIVATE uint32_t MaxNumberForNBits(uint32_t n)
+{
+    uint64_t max = 0;
+    
+    while (n-- > 0) {
+        max |= 1 << n;
+    }
+    
+    return max;
+}
 
 API
 ImageKit_Image *
@@ -119,20 +170,19 @@ ImageKit_Image_FromPNG(const char *filepath) {
     PNG_IO png;
     size_t x, y, c;
     REAL scale;
-    REAL *ptr;
-    int colorspace;
+    
+    /*
+    
+    TODO: Expand greyscale to RGB.
+    TODO: Images always have 3 channels.
+    
+    */
     
     if (PNG_Open_Read(filepath, &png) < 0) {
         return NULL;
     }
     
-    if (png.channels < 3) {
-        colorspace = IMAGEKIT_COLORSPACE_GREY;
-    } else {
-        colorspace = IMAGEKIT_COLORSPACE_RGB;
-    }
-    
-    self = ImageKit_Image_New(png.width, png.height, png.channels, colorspace);
+    self = ImageKit_Image_New(png.width, png.height, png.channels);
     if (!self) {
         PNG_Close(&png);
         
@@ -143,37 +193,32 @@ ImageKit_Image_FromPNG(const char *filepath) {
         return NULL;
     }
     
-    // depth=8, depth=16
-    if (png.depth == 8) {
-        scale = 1.0 / 255.0;
-    } else if (png.depth == 16) {
-        scale = 1.0 / 65535.0;
-    } else {
-        #ifdef DEBUG
-          fprintf(stderr, "unknown / unsupported bit-depth %u\n", png.depth);
-        #endif
+    if (png.channels == 1) {
+        // TODO: Dynamic depth.
+        //MaxNumberForNBits(png.depth)
+    
+        if (png.depth <= 8) {
+        } else if (png.depth == 16) {
+        } else {
+            #ifdef DEBUG
+                fprintf(stderr, "unsupported depth, %d\n", png.depth);
+            #endif
         
-        PNG_Close(&png);
-        return NULL;
-    }
-    
-    ptr = self->data1;
-    
-    if (png.depth == 16) {
-        for (y = 0; y < self->height; y++) {
-            for (x = 0; x < self->width; x++) {
-                for (c = 0; c < png.channels; c++) {
-                    *ptr++ = (REAL)png.row_pointers16[y][x * png.channels + c] * scale;
-                }
-            }
+            PNG_Close(&png);
+            return -1;
         }
     } else {
-        for (y = 0; y < self->height; y++) {
-            for (x = 0; x < self->width; x++) {
-                for (c = 0; c < png.channels; c++) {
-                    *ptr++ = (REAL)png.row_pointers[y][x * png.channels + c] * scale;
-                }
-            }
+        if (png.depth == 8) {
+            Import_PNG_rgb8bpp(self, &png, 1.0 / (double)MaxNumberForNBits(png.depth));
+        } else if (png.depth == 16) {
+            Import_PNG_rgb16bpp(self, &png, 1.0 / (double)MaxNumberForNBits(png.depth));
+        } else {
+            #ifdef DEBUG
+                fprintf(stderr, "unsupported depth, %d\n", png.depth);
+            #endif
+        
+            PNG_Close(&png);
+            return -1;
         }
     }
     
@@ -277,6 +322,8 @@ ImageKit_Image_SavePNG(ImageKit_Image *self, const char *filepath, uint32_t dept
                 for (c = 0; c < self->channels; c++) {
                     value = *ptr_in++;
                     value32 = (int32_t)(CLAMP(0.0, 1.0, value) * scale);
+                    
+                    // TODO: Is this the best way to do this? Seems architecture-dependant.
                     *row++ = value32 >> 8 & 0xff;
                     *row++ = value32      & 0xff;
                 }

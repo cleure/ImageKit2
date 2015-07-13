@@ -13,7 +13,6 @@ TODO:
 API typedef struct ImageKit_Image {
     ImageKit_Error error;
     
-    int colorspace;
     DIMENSION width;
     DIMENSION height;
     DIMENSION channels;
@@ -28,8 +27,7 @@ ImageKit_Image *
 ImageKit_Image_New(
     DIMENSION width,
     DIMENSION height,
-    DIMENSION channels,
-    int colorspace
+    DIMENSION channels
 );
 
 API

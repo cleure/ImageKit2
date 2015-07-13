@@ -10,8 +10,7 @@ ImageKit_Image *
 ImageKit_Image_New(
     DIMENSION width,
     DIMENSION height,
-    DIMENSION channels,
-    int colorspace
+    DIMENSION channels
 )
 {
     ImageKit_Image *self;
@@ -42,7 +41,6 @@ ImageKit_Image_New(
     memset(data2, 0, data_size);
     memset(&self->error, 0, sizeof(self->error));
     
-    self->colorspace = colorspace;
     self->width = width;
     self->height = height;
     self->channels = channels;
@@ -86,7 +84,7 @@ ImageKit_Image_Clone(
     size_t data_items = self->width * self->height * self->channels;
     size_t data_size = sizeof(*(self->data1)) * data_items;
     
-    clone = ImageKit_Image_New(self->width, self->height, self->channels, self->colorspace);
+    clone = ImageKit_Image_New(self->width, self->height, self->channels);
     if (!clone) {
         return NULL;
     }
