@@ -15,9 +15,6 @@
 #define API
 #define PRIVATE static
 
-#define PIXEL_INDEX(self, x, y)\
-    (self->pitch * (y)) + ((x) * self->channels)
-
 #define MAX(r, s) ((r) + (s) + fabs((r) - (s))) / 2
 #define MIN(r, s) ((r) + (s) - fabs((r) - (s))) / 2
 #define CLAMP(minValue, maxValue, value) MAX(minValue, MIN(maxValue, value))

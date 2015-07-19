@@ -1,7 +1,9 @@
 cmake_minimum_required (VERSION 2.6)
 project (libimagekit)
 
-set (DEBUG 1)
+# Turn DEBUG on
+add_definitions(-DDEBUG)
+
 set (libimagekit_VERSION_MAJOR 2)
 set (libimagekit_VERSION_MINOR 0)
 set (libimagekit_VERSION_PATCH 0)

@@ -159,12 +159,12 @@ int main(int argc, char **argv)
     
     srand(0xfffe);
     
-    im = ImageKit_Image_FromPNG("./images/colors.png");
+    im = ImageKit_Image_FromJPEG("./images/10bit?.jpg");
     if (im == NULL) {
         exit(1);
     }
     
-    ImageKit_Image_SavePNG(im, "output.png", 16);
+    //ImageKit_Image_SavePNG(im, "output.png", 8);
     
     printf("%f %f %f\n", im->data1[0], im->data1[1], im->data1[2]);
 

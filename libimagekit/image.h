@@ -10,12 +10,16 @@ TODO:
 
 */
 
+#define CHANNELS 3
+
+//#define PIXEL_INDEX(self, x, y)\
+//    (self->pitch * (y)) + ((x) * CHANNELS)
+
 API typedef struct ImageKit_Image {
     ImageKit_Error error;
     
     DIMENSION width;
     DIMENSION height;
-    DIMENSION channels;
     DIMENSION pitch;
     
     REAL *data1;
@@ -26,8 +30,7 @@ API
 ImageKit_Image *
 ImageKit_Image_New(
     DIMENSION width,
-    DIMENSION height,
-    DIMENSION channels
+    DIMENSION height
 );
 
 API
@@ -50,14 +53,14 @@ ImageKit_Image_SetError(
     char *msg
 );
 
-API
-void
-ImageKit_Image_SetPixel(
-    ImageKit_Image *self,
-    DIMENSION x,
-    DIMENSION y,
-    REAL *data
-);
+//API
+//void
+//ImageKit_Image_SetPixel(
+//    ImageKit_Image *self,
+//    DIMENSION x,
+//    DIMENSION y,
+//    REAL *data
+//);
 
 void
 ImageKit_Image_SwapBuffers(

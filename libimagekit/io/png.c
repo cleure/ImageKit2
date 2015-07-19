@@ -83,7 +83,13 @@ PNG_Open_Read(const char *filepath, PNG_IO *png)
     
     // Init PNG stuff
     png_init_io(png->png_ptr, fp);
-    png_read_png(png->png_ptr, png->info_ptr, PNG_TRANSFORM_IDENTITY | PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_STRIP_ALPHA, NULL);
+    png_read_png(
+        png->png_ptr,
+        png->info_ptr,
+        PNG_TRANSFORM_IDENTITY | PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_STRIP_ALPHA,
+        NULL
+    );
+    
     fclose(fp);
     fp = NULL;
     
@@ -112,8 +118,8 @@ PRIVATE void Import_PNG_rgb8bpp(ImageKit_Image *self, PNG_IO *png, REAL scale) {
 
     for (y = 0; y < self->height; y++) {
         for (x = 0; x < self->width; x++) {
-            for (c = 0; c < png->channels; c++) {
-                *ptr++ = (REAL)png->row_pointers[y][x * png->channels + c] * scale;
+            for (c = 0; c < 3; c++) {
+                *ptr++ = (REAL)png->row_pointers[y][x * 3 + c] * scale;
             }
         }
     }
@@ -125,32 +131,42 @@ PRIVATE void Import_PNG_rgb16bpp(ImageKit_Image *self, PNG_IO *png, REAL scale) 
 
     for (y = 0; y < self->height; y++) {
         for (x = 0; x < self->width; x++) {
-            for (c = 0; c < png->channels; c++) {
-                *ptr++ = (REAL)png->row_pointers16[y][x * png->channels + c] * scale;
+            for (c = 0; c < 3; c++) {
+                *ptr++ = (REAL)png->row_pointers16[y][x * 3 + c] * scale;
             }
         }
     }
 }
 
-/*
-
-PRIVATE void Import_PNG_grey8bpp() {
+PRIVATE void Import_PNG_grey8bpp(ImageKit_Image *self, PNG_IO *png, REAL scale) {
+    size_t x, y;
+    REAL *ptr = &(self->data1[0]);
+    REAL value;
+    
+    for (y = 0; y < self->height; y++) {
+        for (x = 0; x < self->width; x++) {
+            value = (REAL)png->row_pointers[y][x * png->channels] * scale;
+            *ptr++ = value;
+            *ptr++ = value;
+            *ptr++ = value;
+        }
+    }
 }
 
-PRIVATE void Import_PNG_grey16bpp() {
+PRIVATE void Import_PNG_grey16bpp(ImageKit_Image *self, PNG_IO *png, REAL scale) {
+    size_t x, y;
+    REAL *ptr = &(self->data1[0]);
+    REAL value;
+    
+    for (y = 0; y < self->height; y++) {
+        for (x = 0; x < self->width; x++) {
+            value = (REAL)png->row_pointers16[y][x * png->channels] * scale;
+            *ptr++ = value;
+            *ptr++ = value;
+            *ptr++ = value;
+        }
+    }
 }
-*/
-
-/*
-
-    color_type     - describes which color/alpha channels
-                         are present.
-                     PNG_COLOR_TYPE_GRAY
-                        (bit depths 1, 2, 4, 8, 16)
-                     PNG_COLOR_TYPE_RGB
-                        (bit_depths 8, 16)
-
-*/
 
 PRIVATE uint32_t MaxNumberForNBits(uint32_t n)
 {
@@ -168,21 +184,15 @@ ImageKit_Image *
 ImageKit_Image_FromPNG(const char *filepath) {
     ImageKit_Image *self;
     PNG_IO png;
-    size_t x, y, c;
     REAL scale;
     
-    /*
-    
-    TODO: Expand greyscale to RGB.
-    TODO: Images always have 3 channels.
-    
-    */
+    void (*importFn)(ImageKit_Image *self, PNG_IO *png, REAL scale) = NULL;
     
     if (PNG_Open_Read(filepath, &png) < 0) {
         return NULL;
     }
     
-    self = ImageKit_Image_New(png.width, png.height, png.channels);
+    self = ImageKit_Image_New(png.width, png.height);
     if (!self) {
         PNG_Close(&png);
         
@@ -190,38 +200,44 @@ ImageKit_Image_FromPNG(const char *filepath) {
           fprintf(stderr, "error creating image\n");
         #endif
         
+        PNG_Close(&png);
         return NULL;
     }
     
-    if (png.channels == 1) {
-        // TODO: Dynamic depth.
-        //MaxNumberForNBits(png.depth)
-    
-        if (png.depth <= 8) {
-        } else if (png.depth == 16) {
-        } else {
-            #ifdef DEBUG
-                fprintf(stderr, "unsupported depth, %d\n", png.depth);
-            #endif
+    if (png.channels != 1 && png.channels != 3) {
+        #ifdef DEBUG
+          fprintf(stderr, "libpng, image should have either 1 or 3 channels\n");
+        #endif
         
-            PNG_Close(&png);
-            return -1;
+        return NULL;
+    }
+    
+    // Get function pointer to correct import function, for given channels and depth.
+    if (png.channels == 1) {
+        if (png.depth <= 8) {
+            importFn = Import_PNG_grey8bpp;
+        } else if (png.depth == 16) {
+            importFn = Import_PNG_grey16bpp;
         }
     } else {
         if (png.depth == 8) {
-            Import_PNG_rgb8bpp(self, &png, 1.0 / (double)MaxNumberForNBits(png.depth));
+            importFn = Import_PNG_rgb8bpp;
         } else if (png.depth == 16) {
-            Import_PNG_rgb16bpp(self, &png, 1.0 / (double)MaxNumberForNBits(png.depth));
-        } else {
-            #ifdef DEBUG
-                fprintf(stderr, "unsupported depth, %d\n", png.depth);
-            #endif
-        
-            PNG_Close(&png);
-            return -1;
+            importFn = Import_PNG_rgb16bpp;
         }
     }
     
+    if (!importFn) {
+        #ifdef DEBUG
+            fprintf(stderr, "unsupported depth, %d\n", png.depth);
+        #endif
+    
+        PNG_Close(&png);
+        ImageKit_Image_Delete(self);
+        return NULL;
+    }
+    
+    importFn(self, &png, 1.0 / (double)MaxNumberForNBits(png.depth));
     PNG_Close(&png);
     return self;
 }
@@ -315,11 +331,11 @@ ImageKit_Image_SavePNG(ImageKit_Image *self, const char *filepath, uint32_t dept
     
         // Scale, clamp, copy
         for (y = 0; y < self->height; y++) {
-            png.row_pointers[y] = png_malloc(png.png_ptr, sizeof(png_byte) * self->width * self->channels * 2);
+            png.row_pointers[y] = png_malloc(png.png_ptr, sizeof(png_byte) * self->width * CHANNELS * 2);
             row = png.row_pointers[y];
             
             for (x = 0; x < self->width; x++) {
-                for (c = 0; c < self->channels; c++) {
+                for (c = 0; c < CHANNELS; c++) {
                     value = *ptr_in++;
                     value32 = (int32_t)(CLAMP(0.0, 1.0, value) * scale);
                     
@@ -346,11 +362,11 @@ ImageKit_Image_SavePNG(ImageKit_Image *self, const char *filepath, uint32_t dept
     
         // Scale, clamp, copy
         for (y = 0; y < self->height; y++) {
-            png.row_pointers[y] = png_malloc(png.png_ptr, sizeof(png_byte) * self->width * self->channels);
+            png.row_pointers[y] = png_malloc(png.png_ptr, sizeof(png_byte) * self->width * CHANNELS);
             row = png.row_pointers[y];
             
             for (x = 0; x < self->width; x++) {
-                for (c = 0; c < self->channels; c++) {
+                for (c = 0; c < CHANNELS; c++) {
                     value = *ptr_in++;
                     *row++ = (int32_t)(CLAMP(0.0, 1.0, value) * scale);
                 }

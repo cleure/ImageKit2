@@ -9,14 +9,13 @@ API
 ImageKit_Image *
 ImageKit_Image_New(
     DIMENSION width,
-    DIMENSION height,
-    DIMENSION channels
+    DIMENSION height
 )
 {
     ImageKit_Image *self;
     REAL *data1;
     REAL *data2;
-    size_t data_items = width * height * channels;
+    size_t data_items = width * height * CHANNELS;
     size_t data_size = sizeof(*data1) * data_items;
     
     self = malloc(sizeof(*self));
@@ -43,8 +42,7 @@ ImageKit_Image_New(
     
     self->width = width;
     self->height = height;
-    self->channels = channels;
-    self->pitch = width * channels;
+    self->pitch = width * CHANNELS;
     self->data1 = data1;
     self->data2 = data2;
     
@@ -81,10 +79,10 @@ ImageKit_Image_Clone(
 )
 {
     ImageKit_Image *clone;
-    size_t data_items = self->width * self->height * self->channels;
+    size_t data_items = self->width * self->height * CHANNELS;
     size_t data_size = sizeof(*(self->data1)) * data_items;
     
-    clone = ImageKit_Image_New(self->width, self->height, self->channels);
+    clone = ImageKit_Image_New(self->width, self->height);
     if (!clone) {
         return NULL;
     }
@@ -95,22 +93,22 @@ ImageKit_Image_Clone(
     return clone;
 }
 
-API
-void
-ImageKit_Image_SetPixel(
-    ImageKit_Image *self,
-    DIMENSION x,
-    DIMENSION y,
-    REAL *data
-)
-{
-    DIMENSION c;
-    REAL *ptr = &self->data1[PIXEL_INDEX(self, x, y)];
-    
-    for (c = 0; c < self->channels; c++) {
-        *ptr++ = *data++;
-    }
-}
+//API
+//void
+//ImageKit_Image_SetPixel(
+//    ImageKit_Image *self,
+//    DIMENSION x,
+//    DIMENSION y,
+//    REAL *data
+//)
+//{
+//    DIMENSION c;
+//    REAL *ptr = &self->data1[PIXEL_INDEX(self, x, y)];
+//    
+//    for (c = 0; c < CHANNELS; c++) {
+//        *ptr++ = *data++;
+//    }
+//}
 
 API
 void
