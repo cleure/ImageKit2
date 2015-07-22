@@ -164,7 +164,7 @@ int main(int argc, char **argv)
         exit(1);
     }
     
-    //ImageKit_Image_SavePNG(im, "output.png", 8);
+    ImageKit_Image_SavePNG(im, "output.png", 8);
     
     printf("%f %f %f\n", im->data1[0], im->data1[1], im->data1[2]);
 

@@ -24,3 +24,4 @@
 #include "colorspace.h"
 #include "image.h"
 #include "io/png.h"
+#include "io/jpeg.h"
